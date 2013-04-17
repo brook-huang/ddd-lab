@@ -1,3 +1,0 @@
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:tns="urn:org:sample:hotel:search" targetNamespace="urn:org:sample:hotel:search">
-</xsd:schema>
