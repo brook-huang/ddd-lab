@@ -12,5 +12,6 @@
   <name>api-sample</name>
   <modules>
   	<module>api-interface</module>
+  	<module>api-module</module>
   </modules>
 </project>

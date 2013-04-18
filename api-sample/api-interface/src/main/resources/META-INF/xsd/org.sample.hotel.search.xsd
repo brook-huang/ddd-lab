@@ -1,3 +1,702 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:tns="urn:org:sample:hotel:search" targetNamespace="urn:org:sample:hotel:search">
+	xmlns:tns="urn:org:sample:hotel:search" xmlns:shared="urn:org:sample:hotel:shared"
+	targetNamespace="urn:org:sample:hotel:search">
+
+	<xsd:import namespace="urn:org:sample:hotel:shared"
+		schemaLocation="org.sample.hotel.shared.xsd" />
+
+	<xsd:element name="HotelSearchRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="GeoLocation" type="tns:GeoLocationType"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Lat/Long info for hotel.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Radius" type="tns:RadiusType"
+					minOccurs="0" />
+				<xsd:element name="HotelIdList" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>List of hotel Ids.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="HotelId" type="xsd:int" maxOccurs="unbounded" />
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="RegionIdList" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>List of Region Ids.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="RegionId" type="xsd:int"
+								maxOccurs="unbounded" />
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="StayDates" type="shared:StayDatesType"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Check-In and Check-Out Dates.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="UserCriteria" type="tns:UserCriteriaType"
+					minOccurs="0" />
+				<xsd:element name="Language" type="xsd:string"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>
+							It can be in 2 formats, one is 2-character
+							language code(e.g. "fr"),
+							and one is 2-character language code and
+							2-character country code
+							connected by a hyphen(e.g. "fr-CA"), and
+							they both are based on IETF
+							RFC4646. If 2-character language code
+							is given, the language code
+							must be a valid language code for the
+							point of sale, or an error will be
+							returned. If 2-character
+							language code and 2-character country code
+							connected by a hyphen
+							is given, the hotel service will retrieve hotel contents
+							from the
+							site which the language code corresponds to. If no language
+							code
+							is specified, a default language will be used.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Currency" type="xsd:string"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Requested currency type for dated searches.
+							Value should be a standard ISO 3 letter currency code, e.g. CAD -
+							Canadian dollar, USD - US dollar. If not specified or if search
+							does not contain dates, USD will be returned.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="StarRating" type="xsd:float"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Possible values are: 0, 0.5, 1, 1.5, 2, 2.5, 3,
+							3.5, 4, 4.5, 5.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="MaxHotelCount" type="xsd:int"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The max count of hotels returned.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="QueryText" type="xsd:string"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Query text used for a full text search of hotel
+							data.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Sort" type="tns:SortType" minOccurs="0" />
+				<xsd:element name="Order" type="tns:OrderType"
+					minOccurs="0" />
+				<xsd:element name="ExcludeFieldList" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The list of fields to exclude from the
+							response.
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Field" type="tns:FieldType"
+								maxOccurs="unbounded" />
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="RecreationList" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The list of recreations to used to filter the
+							results.
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Recreation" type="xsd:string"
+								maxOccurs="unbounded" />
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="RoomCriteriaList" type="tns:RoomCriteriaListType"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The list of room criterias with specified adult
+							account and children ages to filter the results. If not
+							specified, default value is 1 room and 2 adults and 0 child.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="SortType">
+		<xsd:annotation>
+			<xsd:documentation>Sort type of search results.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="price" />
+			<xsd:enumeration value="starrating" />
+			<xsd:enumeration value="guestrating" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OrderType">
+		<xsd:annotation>
+			<xsd:documentation>Order of search results.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="desc" />
+			<xsd:enumeration value="asc" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FieldType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="description">
+				<xsd:annotation>
+					<xsd:documentation>Hotel description field</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="address">
+				<xsd:annotation>
+					<xsd:documentation>Hotel address, including
+						StreetAddress,City,Province,Country fields
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="geolocation">
+				<xsd:annotation>
+					<xsd:documentation>Hotel geolocation, including Latitude,Longitude
+						fields
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="thumbnailurl">
+				<xsd:annotation>
+					<xsd:documentation>Hotel thumbnailUrl field</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="remainingcount">
+				<xsd:annotation>
+					<xsd:documentation>Hotel remaining room count field.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="amenitylist">
+				<xsd:annotation>
+					<xsd:documentation>Hotel amenity list field.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="roomtypedescription">
+				<xsd:annotation>
+					<xsd:documentation>Room type description field.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="UserCriteriaType">
+		<xsd:sequence>
+			<xsd:element name="HComHotelID" type="xsd:boolean"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>If set to true then HotelID in request is
+						considered as HcomHotelID and HcomHotelID will be returned in
+						response,otherwise HotelID in request is considered as
+						ExpediaHotelID and HcomHotelID will be not returned in response.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LowestPriceOnly" type="xsd:boolean"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Boolean field to toggle between all room types
+						and the lowest priced room type. "true" (default value) represents
+						only the room type with the lowest price will be returned, "false"
+						represents all room types will be returned.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AvailableOnly" type="xsd:boolean"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Boolean field to toggle between all the hotels
+						and the available hotels. "true" represents returning only
+						available hotels, "false" (default value) represents returning all
+						hotels.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DeeplinkMode" type="tns:DeeplinkType"
+				minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RoomCriteriaListType">
+		<xsd:annotation>
+			<xsd:documentation>List of room criteria with specified adult count
+				and children ages.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TravelerCount" type="shared:TravelerCountType"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="DeeplinkType">
+		<xsd:annotation>
+			<xsd:documentation>Which deeplinks to return. If the element is not
+				specified in request, default value will be "HotelDetails"
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="AllLinks" />
+			<xsd:enumeration value="HotelDetails" />
+			<xsd:enumeration value="RateDetails" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="HotelSearchResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="MatchingHotelCount" type="xsd:long"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The total count of hotels matching the search
+							criteria.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HotelCount" type="xsd:long">
+					<xsd:annotation>
+						<xsd:documentation>The count of hotels actually returned.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="StayDates" type="shared:StayDatesType"
+					minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Check-In and Check-Out Dates.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="HotelInfoList" type="tns:HotelInfoListType">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">List of requested
+							hotels.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="ErrorList" type="tns:ErrorListType"
+					minOccurs="0" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="ErrorType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Client minor error.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Code" type="xsd:int" />
+			<xsd:element name="Details" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ErrorListType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Client minor errors
+				list.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Error" type="tns:ErrorType" minOccurs="1"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RadiusType">
+		<xsd:sequence>
+			<xsd:element name="Value" type="xsd:float" nillable="true" />
+			<xsd:element name="Unit" type="tns:UnitType" default="km" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="UnitType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="mi">
+				<xsd:annotation>
+					<xsd:documentation>Miles</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="km">
+				<xsd:annotation>
+					<xsd:documentation>Kilometers</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="HotelInfoListType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">List of hotel specific
+				info.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="HotelInfo" type="tns:HotelInfoType"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="HotelInfoType">
+		<xsd:sequence>
+			<xsd:element name="HotelID" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>ID of hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="HComHotelID" type="xsd:int" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Hotels.com ID for the requested hotel. This will
+						be returned only if HComID element under UserOptions is set to
+						true. Element will not be returned if the ID is unknown.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Name of hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Location" type="tns:HotelLocationType" />
+			<xsd:element name="Description" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StatusCode" type="xsd:int" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>0=Available - There is at least one RoomType for
+						this hotel that is available. 1=NotAvailable - RoomType list will
+						be empty. 2=Error pricing hotel - See status description for more
+						details
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StatusDescription" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Describes any problems that prevented checking
+						the availability of the hotel. For example: invalid hotelID,
+						duplicate hotelID
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FeaturedOffer" type="tns:FeaturedOfferType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Lowest Price information in case of a dateless
+						search request.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Price" type="shared:PriceType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Price information for the entire stay for the
+						least expensive room available. If multiple rooms are requested,
+						this represents the total price of all rooms.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="HotelMandatoryTaxesAndFees" type="shared:AmountType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Hotel mandatory taxes and fees for the entire
+						stay for the least expensive room available. If multiple rooms are
+						requested, this represents the total hotel mandatory taxes and
+						fees for all rooms. Collected by the hotel after check-in, not
+						included in the TotalRate.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Promotion" type="shared:PromotionType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total savings for the duration of the stay for
+						the least expensive room available. If multiple rooms are
+						requested, this represents the total savings for all rooms.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DetailsUrl" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Deeplink to Expedia hotel details page.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RateDetailsUrl" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Deeplink to EWSHotel rate details message. Link
+						will only be returned for available hotels (StatusCode=0)
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StarRating" type="xsd:float"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Possible values are: 0.5, 1, 1.5, 2, 2.5, 3,
+						3.5, 4, 4.5, 5. Will be returned only if the value is non zero.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ThumbnailUrl" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>URL for a thumbnail image of the hotel.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GuestRating" type="xsd:float"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The average overall guest rating.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RoomTypeList" type="tns:RoomTypeListType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>List of room types with availability.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AmenityList" type="shared:AmenityListType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>List of amenities offered at the hotel. Only
+						certain top amenities are included.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RoomTypeListType">
+		<xsd:annotation>
+			<xsd:documentation>List of room type.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="RoomType" type="tns:RoomTypeType"
+				maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>A specific type of room offered by the hotel.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RoomTypeType">
+		<xsd:sequence>
+			<xsd:element name="Description" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Localized text description of the room type.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RemainingCount" type="xsd:int"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Count of remaining rooms of this type still
+						available through Expedia.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Price" type="shared:PriceType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Price information for the entire stay for all
+						rooms requested.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Promotion" type="shared:PromotionType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total savings for the entire stay for all rooms
+						requested.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="HotelMandatoryTaxesAndFees" type="shared:AmountType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Hotel mandatory taxes and fees for the entire
+						stay for all rooms requested. Collected by the hotel after
+						check-in, not included in the TotalRate.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RateDetailsUrl" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Deeplink rate details message for each EwsHotel
+						room types. Link will only be returned for available hotels
+						(StatusCode=0)
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RoomAmenityList" type="tns:RoomAmenityListType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Rate Plan Amenity list for each room type.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Refundable" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>Indicate whether the room type is refundable or
+						not.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="RoomAmenityListType">
+		<xsd:annotation>
+			<xsd:documentation>List of room type amenities.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="RoomAmenity" type="tns:RoomAmenityType"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="RoomAmenityType">
+		<xsd:sequence>
+			<xsd:element name="ID" type="xsd:unsignedInt">
+				<xsd:annotation>
+					<xsd:documentation>The unique ID of the amenity.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>The localized name of the amenity.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FeaturedOfferType">
+		<xsd:sequence>
+			<xsd:element name="Price" type="shared:PriceType">
+				<xsd:annotation>
+					<xsd:documentation>Lowest Price information for the duration of
+						stay.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CheckInDate" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>Check-In Date for the featured price returned in
+						a dateless response.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LengthOfStay" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>Length of Stay for the featured price returned
+						in a dateless search response.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DetailsUrl" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Deeplink to Expedia hotel details page for the
+						featured offer.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Promotion" type="shared:PromotionType"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total Savings for the duration of the featured
+						stay.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="HotelLocationType">
+		<xsd:sequence>
+			<xsd:element name="StreetAddress" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Street address of hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="City" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>City of hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Province" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Province/state of hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Country" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Country code of hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GeoLocation" type="tns:GeoLocationType">
+				<xsd:annotation>
+					<xsd:documentation>Lat/Long info for hotel.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="GeoLocationType">
+		<xsd:sequence>
+			<xsd:element name="Latitude" type="xsd:double" nillable="true">
+				<xsd:annotation>
+					<xsd:documentation>Latitude of hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Longitude" type="xsd:double" nillable="true">
+				<xsd:annotation>
+					<xsd:documentation>Longitude hotel returned in search.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="HotelSearchFault">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ErrorCode" type="xsd:int" />
+				<xsd:element name="Details" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
 </xsd:schema>
